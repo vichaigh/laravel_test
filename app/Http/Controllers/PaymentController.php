@@ -51,6 +51,13 @@ class PaymentController extends Controller
      */
     public function webhook(string $provider, Request $request): JsonResponse
     {
+        $webhookSecret = (string) config("services.{$provider}.webhook_secret");
+        $providedToken = (string) $request->bearerToken();
+
+        if ($webhookSecret === '' || ! hash_equals($webhookSecret, $providedToken)) {
+            abort(401);
+        }
+
         try {
             $driver = PaymentProviderFactory::make($provider);
             $result = $driver->handleWebhook($request);

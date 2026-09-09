@@ -58,5 +58,4 @@ return [
         'secret' => env('PROVIDER2_API_SECRET'),
         'webhook_secret' => env('PROVIDER2_WEBHOOK_SECRET'),
     ],
-
 ];

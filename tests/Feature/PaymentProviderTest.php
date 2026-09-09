@@ -83,8 +83,31 @@ class PaymentProviderTest extends TestCase
 
     public function test_webhook_rejects_invalid_signature(): void
     {
-        $this->postJson('/api/provider1/webhook', ['event_type' => 'charge.succeeded'])
+        $this->withToken('whsec_p1')
+            ->postJson('/api/provider1/webhook', ['event_type' => 'charge.succeeded'])
             ->assertStatus(401);
+    }
+
+    public function test_webhook_returns_401_when_bearer_token_is_missing(): void
+    {
+        $this->postJson('/api/provider1/webhook', ['event_type' => 'charge.succeeded'])
+            ->assertUnauthorized();
+    }
+
+    public function test_webhook_returns_401_when_bearer_token_does_not_match_provider_secret(): void
+    {
+        $this->withToken('invalid-webhook-secret')
+            ->postJson('/api/provider1/webhook', ['event_type' => 'charge.succeeded'])
+            ->assertUnauthorized();
+    }
+
+    public function test_webhook_returns_401_when_provider_webhook_secret_is_not_configured(): void
+    {
+        config()->set('services.provider1.webhook_secret');
+
+        $this->withToken('whsec_p1')
+            ->postJson('/api/provider1/webhook', ['event_type' => 'charge.succeeded'])
+            ->assertUnauthorized();
     }
 
     public function test_webhook_accepts_valid_signature(): void
@@ -92,7 +115,8 @@ class PaymentProviderTest extends TestCase
         $payload = ['event_type' => 'charge.succeeded', 'data' => ['id' => 'ch_9', 'status' => 'paid']];
         $signature = hash_hmac('sha256', json_encode($payload), 'whsec_p1');
 
-        $this->withHeaders(['X-Provider1-Signature' => $signature])
+        $this->withToken('whsec_p1')
+            ->withHeaders(['X-Provider1-Signature' => $signature])
             ->postJson('/api/provider1/webhook', $payload)
             ->assertOk()
             ->assertJson([
