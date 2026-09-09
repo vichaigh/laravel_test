@@ -2,17 +2,19 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    use RefreshDatabase;
-
     public function test_returns_a_successful_response()
     {
-        $response = $this->get(route('home'));
+        $response = $this->getJson('/');
 
-        $response->assertOk();
+        $response->assertOk()->assertJson(['status' => 'ok']);
+    }
+
+    public function test_api_health_endpoint_responds()
+    {
+        $this->getJson('/api/health')->assertOk()->assertJson(['status' => 'ok']);
     }
 }

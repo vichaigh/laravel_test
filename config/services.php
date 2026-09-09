@@ -35,4 +35,28 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Payment Providers
+    |--------------------------------------------------------------------------
+    |
+    | Credentials for the multi-provider payment integration. Each key here
+    | matches a driver registered in App\Factories\PaymentProviderFactory.
+    |
+    */
+
+    'provider1' => [
+        'base_url' => env('PROVIDER1_BASE_URL', 'https://api.provider1.com/v1'),
+        'api_key' => env('PROVIDER1_API_KEY'),
+        'secret' => env('PROVIDER1_API_SECRET'),
+        'webhook_secret' => env('PROVIDER1_WEBHOOK_SECRET'),
+    ],
+
+    'provider2' => [
+        'base_url' => env('PROVIDER2_BASE_URL', 'https://api.provider2.com/v2'),
+        'api_key' => env('PROVIDER2_API_KEY'),
+        'secret' => env('PROVIDER2_API_SECRET'),
+        'webhook_secret' => env('PROVIDER2_WEBHOOK_SECRET'),
+    ],
+
 ];
